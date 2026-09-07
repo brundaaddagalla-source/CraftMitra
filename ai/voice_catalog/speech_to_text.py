@@ -2,9 +2,9 @@ from faster_whisper import WhisperModel
 
 
 model = WhisperModel(
-    "tiny",
-    device="cpu",
-    compute_type="int8"
+    "large-v3",
+    device="cuda",
+    compute_type="float16"
 )
 
 
