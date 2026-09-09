@@ -13,6 +13,26 @@ scipy
 onnxruntime
 
 
+
+fastapi
+uvicorn[standard]
+
+sqlalchemy
+
+psycopg[binary]
+
+pydantic
+pydantic-settings
+
+PyJWT
+bcrypt
+
+python-dotenv
+python-multipart
+
+email-validator
+
+
 backgroundremover==0.4.5
 blinker==1.9.0
 certifi==2026.7.22
