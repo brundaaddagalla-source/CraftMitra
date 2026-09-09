@@ -1,3 +1,12 @@
+import sys
+from pathlib import Path
+
+# Make `backend/` importable as the root for `app.*` imports,
+# even when the process is launched from the project root.
+_BACKEND_DIR = Path(__file__).resolve().parent.parent  # .../proj3/backend
+if str(_BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_DIR))
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text

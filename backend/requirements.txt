@@ -15,3 +15,17 @@ python-dotenv
 python-multipart
 
 email-validator
+
+torch
+transformers
+sentencepiece
+soundfile
+librosa
+numpy
+IndicTransToolkit
+torchaudio
+accelerate
+safetensors
+huggingface_hub
+scipy
+onnxruntime

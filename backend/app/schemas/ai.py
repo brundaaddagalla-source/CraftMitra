@@ -70,12 +70,19 @@ class TranscriptionResponse(BaseModel):
 # =========================================
 
 class AIProductProcessingResponse(BaseModel):
-
     transcript: str
+
+    raw_transcript: str | None = None
+
+    normalized_telugu: str | None = None
+
+    english: str | None = None
+
+    hindi: str | None = None
 
     processed_language: str | None = None
 
-    extracted_product: AIExtractedProductData
+    extracted_product: AIExtractedProductData | None = None
 
     ai_generated_description: str | None = None
 
