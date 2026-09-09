@@ -14,7 +14,7 @@ from translation import (
 # Supported:
 # MP3, MP4, M4A, FLAC, OGG, WAV, etc.
 
-audio_file = "telugu.mp4"
+audio_file = "telugu4.ogg"
 
 
 # ============================================================
