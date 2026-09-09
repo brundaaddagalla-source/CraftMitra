@@ -1,0 +1,111 @@
+# ============================================================
+# Python
+# ============================================================
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python packaging
+*.egg-info/
+dist/
+build/
+.eggs/
+
+
+# ============================================================
+# Environment / Secrets
+# ============================================================
+
+.env
+.env.*
+!.env.example
+
+*.pem
+*.key
+
+
+# ============================================================
+# IDE / Editor
+# ============================================================
+
+.vscode/
+.idea/
+
+# VS Code local history
+.history/
+
+
+# ============================================================
+# OS Files
+# ============================================================
+
+.DS_Store
+Thumbs.db
+
+
+# ============================================================
+# Logs
+# ============================================================
+
+*.log
+logs/
+
+
+# ============================================================
+# Temporary Files
+# ============================================================
+
+*.tmp
+*.temp
+tmp/
+temp/
+
+
+# ============================================================
+# CraftMitra AI Image Enhancement
+# ============================================================
+
+# Sample images and generated enhancement outputs
+data/sampleImages/
+
+# Generated masks
+*_mask.png
+*_mask.jpg
+*_mask.jpeg
+
+# Generated pipeline outputs
+*_pipeline/
+*_pipeline_final.png
+*_pipeline_final.jpg
+*_pipeline_final.jpeg
+
+# Enhancement intermediate images
+01_lighting_corrected.png
+02_raw_mask.png
+03_refined_mask.png
+04_generated_background.png
+final_image.png
+
+
+# ============================================================
+# ML / AI temporary model files
+# ============================================================
+
+# Prevent accidental commits of large downloaded model files
+*.pth
+*.pt
+*.onnx
+
+
+# ============================================================
+# Jupyter / Python notebooks
+# ============================================================
+
+.ipynb_checkpoints/
