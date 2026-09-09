@@ -17,53 +17,28 @@ function AIProcessing() {
   const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
 
-  // const steps = [
-  //   {
-  //     title: "Analyzing your craft image",
-  //     description: "Identifying the product, materials and craft characteristics",
-  //     icon: <Sparkles size={18} />
-  //   },
-  //   {
-  //     title: "Understanding your story",
-  //     description: `Converting your ${language} voice description into product details`,
-  //     icon: <Sparkles size={18} />
-  //   },
-  //   {
-  //     title: "Creating your product listing",
-  //     description: "Generating a professional product name and description",
-  //     icon: <Package size={18} />
-  //   },
-  //   {
-  //     title: "Calculating a fair price",
-  //     description: "Preparing a suitable price recommendation",
-  //     icon: <IndianRupee size={18} />
-  //   }
-  // ];
-
-  const spokenLanguageLabel = t(language);
-
-const steps = [
-  {
-    title: "Analyzing your craft image",
-    description: t("Identifying the product, materials and craft characteristics"),
-    icon: <Sparkles size={18} />
-  },
-  {
-    title: "Understanding your story",
-    description: t("Converting your spoken Language Label voice description into product details"),
-    icon: <Sparkles size={18} />
-  },
-  {
-    title: "Creating your product listing",
-    description: t("Generating a professional product name and description"),
-    icon: <Package size={18} />
-  },
-  {
-    title: "Calculating a fair price",
-    description: t("Preparing a suitable price recommendation"),
-    icon: <IndianRupee size={18} />
-  }
-];
+  const steps = [
+    {
+      title: "Analyzing your craft image",
+      description: "Identifying the product, materials and craft characteristics",
+      icon: <Sparkles size={18} />
+    },
+    {
+      title: "Understanding your story",
+      description: `Converting your ${language} voice description into product details`,
+      icon: <Sparkles size={18} />
+    },
+    {
+      title: "Creating your product listing",
+      description: "Generating a professional product name and description",
+      icon: <Package size={18} />
+    },
+    {
+      title: "Calculating a fair price",
+      description: "Preparing a suitable price recommendation",
+      icon: <IndianRupee size={18} />
+    }
+  ];
 
   useEffect(() => {
     const timers = [
@@ -135,13 +110,14 @@ const steps = [
       <div className="ai-processing-header">
 
         <h1>
-  {t("Turning your craft into")}
-  <span> {t("a marketplace story")}</span>
-</h1>
+          Turning your craft into
+          <span> a marketplace story</span>
+        </h1>
 
-<p>
-  {t("Sit back while CraftMitra transforms your photo and story into a professional product listing.")}
-</p>
+        <p>
+          Sit back while CraftMitra transforms your photo and story
+          into a professional product listing.
+        </p>
 
       </div>
 
@@ -201,12 +177,12 @@ const steps = [
                 <div className="step-content">
 
                   <strong>
-  {t(step.title)}
-</strong>
+                    {step.title}
+                  </strong>
 
-<span>
-  {step.description}
-</span>
+                  <span>
+                    {step.description}
+                  </span>
 
                 </div>
 
