@@ -1,0 +1,74 @@
+/* .language-selector {
+  position: fixed;
+  top: 16px;
+  right: 18px;
+  z-index: 2000;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 5px 8px;
+  border: 1px solid rgba(41, 67, 50, 0.15);
+  border-radius: 9px;
+  background: rgba(255, 253, 248, 0.96);
+  color: #294332;
+  box-shadow: 0 4px 14px rgba(41, 67, 50, 0.08);
+  backdrop-filter: blur(8px);
+}
+
+.language-selector select {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .language-selector {
+     position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+} */
+
+.language-selector {
+  position: fixed;
+  top: 16px;
+  right: 18px;
+  z-index: 2000;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 5px 8px;
+  border: 1px solid rgba(41, 67, 50, 0.15);
+  border-radius: 9px;
+  background: rgba(255, 253, 248, 0.96);
+  color: #294332;
+  box-shadow: 0 4px 14px rgba(41, 67, 50, 0.08);
+  backdrop-filter: blur(8px);
+}
+
+.language-selector select {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* On mobile, don't let it float over scrolled content forever —
+   anchor it near the top of the page so it scrolls away with
+   the header instead of permanently occupying screen space. */
+@media (max-width: 600px) {
+  .language-selector {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+}
