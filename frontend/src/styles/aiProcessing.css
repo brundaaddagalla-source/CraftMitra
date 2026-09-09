@@ -1,0 +1,559 @@
+/* .ai-processing-page {
+  min-height: 100vh;
+  background: #f7f3eb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.ai-processing-content {
+  width: min(680px, 100%);
+  text-align: center;
+}
+
+.ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  color: #b7603b;
+  margin-bottom: 14px;
+}
+
+.ai-processing-content h1 {
+  margin: 0;
+  color: #294332;
+  font-size: 34px;
+  line-height: 1.15;
+  font-weight: 600;
+}
+
+.ai-processing-content h1 span {
+  color: #b7603b;
+}
+
+.ai-subtitle {
+  max-width: 500px;
+  margin: 14px auto 28px;
+  color: #777b74;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.processing-card {
+  background: #fffdf8;
+  border: 1px solid #e6ded1;
+  border-radius: 20px;
+  padding: 30px;
+  text-align: left;
+  box-shadow: 0 15px 40px rgba(54, 48, 38, 0.08);
+}
+
+.processing-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #f1e4d5;
+  color: #b7603b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+}
+
+.processing-heading {
+  text-align: center;
+  color: #294332;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.processing-subheading {
+  text-align: center;
+  color: #858982;
+  font-size: 10px;
+  margin-top: 5px;
+  margin-bottom: 25px;
+}
+
+.processing-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.processing-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px;
+  border-radius: 11px;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.processing-step.active {
+  background: #faf4eb;
+  border-color: #eadbca;
+}
+
+.processing-step.done {
+  background: #f4f7f1;
+}
+
+.step-icon {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 50%;
+  background: #eee9df;
+  color: #858982;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.processing-step.active .step-icon {
+  background: #c96a3d;
+  color: white;
+  animation: pulse 1.5s infinite;
+}
+
+.processing-step.done .step-icon {
+  background: #63795d;
+  color: white;
+}
+
+.step-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.step-text strong {
+  color: #39483e;
+  font-size: 11px;
+}
+
+.step-text span {
+  color: #8a8d86;
+  font-size: 9px;
+}
+
+.step-status {
+  margin-left: auto;
+  color: #63795d;
+}
+
+.progress-section {
+  margin-top: 25px;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  color: #737970;
+  font-size: 9px;
+  margin-bottom: 7px;
+}
+
+.progress-track {
+  width: 100%;
+  height: 6px;
+  background: #e9e2d8;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #c96a3d;
+  border-radius: 10px;
+  transition: width 0.7s ease;
+}
+
+.view-listing-button {
+  display: block;
+  margin: 25px auto 0;
+  border: none;
+  background: #294332;
+  color: white;
+  padding: 11px 22px;
+  border-radius: 8px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.view-listing-button:hover {
+  background: #3a5844;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(201, 106, 61, 0.35);
+  }
+
+  70% {
+    box-shadow: 0 0 0 9px rgba(201, 106, 61, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(201, 106, 61, 0);
+  }
+}
+
+@media (max-width: 600px) {
+  .ai-processing-page {
+    padding: 20px;
+  }
+
+  .ai-processing-content h1 {
+    font-size: 27px;
+  }
+
+  .processing-card {
+    padding: 20px;
+  }
+} */
+
+/* =========================================
+   CRAFTMITRA AI PROCESSING
+========================================= */
+
+.ai-processing-page {
+  min-height: 100vh;
+  background: #f7f3ea;
+  color: #29372c;
+  padding: 35px 25px 60px;
+}
+
+
+/* =========================================
+   BRAND
+========================================= */
+
+.ai-processing-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  color: #c96a3d;
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.ai-processing-header {
+  text-align: center;
+  margin-top: 27px;
+}
+
+.ai-processing-header h1 {
+  margin: 0;
+
+  font-size: 40px;
+  line-height: 1.15;
+
+  letter-spacing: -1.4px;
+
+  color: #29372c;
+}
+
+.ai-processing-header h1 span {
+  color: #b7603b;
+}
+
+.ai-processing-header p {
+  margin: 17px auto 0;
+
+  max-width: 620px;
+
+  color: #7f8881;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* =========================================
+   PROCESSING CARD
+========================================= */
+
+.processing-card {
+  width: min(900px, 100%);
+
+  margin: 42px auto 0;
+
+  padding: 42px;
+
+  background: #fffdf8;
+
+  border: 1px solid #e5ddd0;
+
+  border-radius: 24px;
+
+  box-shadow:
+    0 20px 50px rgba(63, 55, 42, 0.08);
+}
+
+
+/* =========================================
+   MAIN ICON
+========================================= */
+
+.processing-main-icon {
+  width: 70px;
+  height: 70px;
+
+  margin: 0 auto 22px;
+
+  border-radius: 50%;
+
+  background: #f2e4d5;
+
+  color: #c96a3d;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* =========================================
+   TITLE
+========================================= */
+
+.processing-card h2 {
+  margin: 0;
+
+  text-align: center;
+
+  font-size: 24px;
+  letter-spacing: -0.5px;
+
+  color: #29372c;
+}
+
+.processing-subtitle {
+  margin: 7px 0 30px;
+
+  text-align: center;
+
+  color: #899189;
+
+  font-size: 12px;
+}
+
+
+/* =========================================
+   STEPS
+========================================= */
+
+.processing-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.processing-step {
+  min-height: 66px;
+
+  padding: 13px 16px;
+
+  border-radius: 15px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  background: #faf7f0;
+
+  border: 1px solid transparent;
+
+  transition: 0.3s ease;
+}
+
+
+/* ACTIVE STEP */
+
+.processing-step.active {
+  background: #faf3e9;
+  border-color: #ead7c6;
+}
+
+
+/* COMPLETED */
+
+.processing-step.completed {
+  background: #f2f6f0;
+}
+
+
+/* =========================================
+   STEP ICON
+========================================= */
+
+.step-icon {
+  width: 44px;
+  height: 44px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #eee8dd;
+
+  color: #9b9589;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.processing-step.active .step-icon {
+  background: #f0dfd1;
+  color: #c96a3d;
+}
+
+.processing-step.completed .step-icon {
+  background: #63805f;
+  color: white;
+}
+
+
+/* =========================================
+   STEP CONTENT
+========================================= */
+
+.step-content {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+
+  flex: 1;
+}
+
+.step-content strong {
+  font-size: 13px;
+
+  color: #29372c;
+}
+
+.step-content span {
+  font-size: 10px;
+
+  color: #9a9e98;
+}
+
+
+/* =========================================
+   RIGHT CHECK
+========================================= */
+
+.step-status {
+  width: 25px;
+
+  display: flex;
+  justify-content: center;
+
+  color: #63805f;
+}
+
+
+/* =========================================
+   PROGRESS
+========================================= */
+
+.processing-progress {
+  margin-top: 27px;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+
+  margin-bottom: 8px;
+
+  font-size: 10px;
+
+  color: #7f8881;
+}
+
+.progress-track {
+  width: 100%;
+  height: 6px;
+
+  border-radius: 10px;
+
+  background: #e8e1d6;
+
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+
+  border-radius: 10px;
+
+  background: #c96a3d;
+
+  transition: width 0.5s ease;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 700px) {
+
+  .ai-processing-page {
+    padding: 25px 16px 40px;
+  }
+
+  .ai-processing-header h1 {
+    font-size: 30px;
+  }
+
+  .ai-processing-header p {
+    font-size: 11px;
+  }
+
+  .processing-card {
+    padding: 25px 17px;
+    margin-top: 30px;
+  }
+
+  .processing-card h2 {
+    font-size: 20px;
+  }
+
+  .processing-step {
+    padding: 11px;
+  }
+
+  .step-content strong {
+    font-size: 11px;
+  }
+
+  .step-content span {
+    font-size: 8px;
+  }
+
+  .step-icon {
+    width: 38px;
+    height: 38px;
+  }
+}
