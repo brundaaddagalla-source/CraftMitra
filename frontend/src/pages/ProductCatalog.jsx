@@ -49,7 +49,7 @@ function ProductCatalog() {
       description:
         "A handcrafted product made with care and traditional knowledge.",
 
-      price: "₹2599",
+      price: "₹250",
 
       tags: [
         "Handcrafted",
@@ -202,11 +202,8 @@ function ProductCatalog() {
 
 
         <p>
-
-          We've transformed your photo and story
-          into a marketplace-ready product listing.
-
-        </p>
+  {t("We've transformed your photo and story into a marketplace-ready product listing.")}
+</p>
 
       </div>
 
@@ -512,8 +509,8 @@ function ProductCatalog() {
         <Sparkles size={15} />
 
         <span>
-          AI generated details can be edited before publishing.
-        </span>
+  {t("AI generated details can be edited before publishing.")}
+</span>
 
       </div>
 
