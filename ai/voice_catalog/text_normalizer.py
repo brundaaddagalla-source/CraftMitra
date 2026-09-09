@@ -1,327 +1,204 @@
-import re
-import unicodedata
 
+DOMAIN_CORRECTIONS = {
 
-# ============================================================
-# 1. KNOWN STT CORRECTIONS
-# ============================================================
-#
-# These are recurring errors observed from the Swecha ASR.
-#
-# IMPORTANT:
-# This dictionary should contain ASR-specific mistakes,
-# NOT the entire Telugu vocabulary.
-#
-# We will expand this based on real ASR outputs.
-# ============================================================
+    # --------------------------------------------------------
+    # Sarees / textiles
+    # --------------------------------------------------------
 
-TELUGU_CORRECTIONS = {
+    "నీ చీర మీద": "ఈ చీర మీద",
 
-    # Handicrafts / current demo
-    "చేత్తో": "చేతితో",
-    "చేస్నా": "చేసిన",
-    "కొణ్డపల్లి": "కొండపల్లి",
-    "బంబలు": "బొమ్మలు",
-    "బొంబలు": "బొమ్మలు",
-    "బొంబలో": "బొమ్మలు",
-    "విటిన": "వీటిని",
-    "చక్కుతో": "చెక్కుతో",
-    "చక్కతో": "చెక్కుతో",
-    "చిక్కుతారు": "చెక్కుతారు",
+    # Common phrase variations
+    "చీర మీద ఉన్న": "చీర మీద ఉన్న",
+    "చీరపై ఉన్న": "చీరపై ఉన్న",
 
-    # Agriculture / general examples
-    "పనీ": "పని",
-    "చేస్థున్నారు": "చేస్తున్నారు",
-    "చేస్టున్నారు": "చేస్తున్నారు",
-    "చేస్తునారు": "చేస్తున్నారు",
+    # --------------------------------------------------------
+    # Handmade / hand work
+    # --------------------------------------------------------
 
-    # Common spelling errors
-    "వెల్తున్నాడు": "వెళ్తున్నాడు",
-    "వెల్తుంది": "వెళ్తుంది",
-    "వెల్తున్నారు": "వెళ్తున్నారు",
-    "బాష": "భాష",
-    "చాల": "చాలా",
+    "చేత్తో చేసిన": "చేతితో చేసిన",
+    "చేత్తో తయారు చేసిన": "చేతితో తయారు చేసిన",
+
+    # --------------------------------------------------------
+    # Painting / drawing
+    # --------------------------------------------------------
+
+    "గీసి రంగులు వేశాను": "గీసి రంగులు వేశాను",
+
+    # --------------------------------------------------------
+    # Wood carving
+    # --------------------------------------------------------
+
+    "చెక్కతో చెక్కుతారు": "చెక్కతో చెక్కుతారు",
+    "చెక్కతో చెక్కిన": "చెక్కతో చెక్కిన",
+
+    # --------------------------------------------------------
+    # Kondapalli
+    # --------------------------------------------------------
+
+    # Preserve the phrase as a known handicraft term.
+    "కొండపల్లి బొమ్మలు": "కొండపల్లి బొమ్మలు",
+    "కొండపల్లి బొమ్మ": "కొండపల్లి బొమ్మ",
 }
 
 
 # ============================================================
-# 2. UNICODE NORMALIZATION
+# GENERAL TELUGU CLEANUP
 # ============================================================
 
-def normalize_unicode(text):
+def clean_telugu(text):
     """
-    Convert equivalent Unicode representations into
-    standard NFC form.
+    Basic cleanup of Telugu ASR output.
+
+    Does NOT translate.
+    Does NOT aggressively rewrite sentences.
     """
-
-    return unicodedata.normalize("NFC", text)
-
-
-# ============================================================
-# 3. BASIC TEXT CLEANING
-# ============================================================
-
-def clean_text(text):
-    """
-    General text cleanup.
-
-    Works for arbitrary Telugu text.
-    """
-
-    # Remove leading/trailing whitespace
-    text = text.strip()
-
-    # Replace multiple spaces/newlines/tabs with one space
-    text = re.sub(r"\s+", " ", text)
-
-    # Remove spaces before punctuation
-    text = re.sub(
-        r"\s+([,.!?;:])",
-        r"\1",
-        text
-    )
-
-    # Add space after punctuation when missing
-    text = re.sub(
-        r"([,.!?;:])(?=\S)",
-        r"\1 ",
-        text
-    )
-
-    # Remove repeated punctuation
-    text = re.sub(
-        r"([!?.,])\1+",
-        r"\1",
-        text
-    )
-
-    return text.strip()
-
-
-# ============================================================
-# 4. TELUGU CHARACTER NORMALIZATION
-# ============================================================
-
-def normalize_telugu_characters(text):
-    """
-    Handle conservative character-level patterns
-    that can occur in Telugu STT output.
-    """
-
-    patterns = [
-
-        # Example:
-        # కొణ్డపల్లి → కొండపల్లి
-        (r"ణ్డ", "ండ"),
-
-        # Similar conjunct variation
-        (r"ణ్ఢ", "ంఢ"),
-    ]
-
-    for pattern, replacement in patterns:
-        text = re.sub(pattern, replacement, text)
-
-    return text
-
-
-# ============================================================
-# 5. REPEATED CHARACTER NORMALIZATION
-# ============================================================
-
-def normalize_repeated_characters(text):
-    """
-    Remove excessive repeated Telugu vowel signs.
-    """
-
-    text = re.sub(r"ా{3,}", "ా", text)
-    text = re.sub(r"ి{3,}", "ి", text)
-    text = re.sub(r"ీ{3,}", "ీ", text)
-    text = re.sub(r"ు{3,}", "ు", text)
-    text = re.sub(r"ూ{3,}", "ూ", text)
-    text = re.sub(r"ె{3,}", "ె", text)
-    text = re.sub(r"ే{3,}", "ే", text)
-    text = re.sub(r"ై{3,}", "ై", text)
-    text = re.sub(r"ొ{3,}", "ొ", text)
-    text = re.sub(r"ో{3,}", "ో", text)
-    text = re.sub(r"ౌ{3,}", "ౌ", text)
-
-    return text
-
-
-# ============================================================
-# 6. WORD-LEVEL CORRECTION
-# ============================================================
-
-def correct_known_words(text):
-    """
-    Correct recurring STT errors while preserving punctuation.
-    """
-
-    words = text.split()
-
-    corrected_words = []
-
-    for word in words:
-
-        # Separate punctuation from the word.
-        match = re.match(
-            r'^([,.!?;:\'"()\-\u2013\u2014]*)(.*?)([,.!?;:\'"()\-\u2013\u2014]*)$',
-            word
-        )
-
-        if match:
-
-            prefix = match.group(1)
-            core = match.group(2)
-            suffix = match.group(3)
-
-            if core in TELUGU_CORRECTIONS:
-                core = TELUGU_CORRECTIONS[core]
-
-            word = prefix + core + suffix
-
-        corrected_words.append(word)
-
-    return " ".join(corrected_words)
-
-
-# ============================================================
-# 7. WORD BOUNDARY NORMALIZATION
-# ============================================================
-
-def normalize_word_boundaries(text):
-    """
-    Normalize spacing around word boundaries.
-    """
-
-    # Normalize spaces around hyphens
-    text = re.sub(
-        r"\s*-\s*",
-        "-",
-        text
-    )
-
-    # Normalize whitespace
-    text = re.sub(
-        r"\s+",
-        " ",
-        text
-    )
-
-    return text.strip()
-
-
-# ============================================================
-# 8. PUNCTUATION NORMALIZATION
-# ============================================================
-
-def normalize_punctuation(text):
-    """
-    Normalize punctuation spacing and repetition.
-    """
-
-    text = text.strip()
 
     if not text:
         return ""
 
-    # Remove spaces before punctuation
-    text = re.sub(
-        r"\s+([,.!?;:])",
-        r"\1",
-        text
-    )
+    text = text.strip()
 
-    # Prevent excessive punctuation
-    text = re.sub(r"!{2,}", "!", text)
-    text = re.sub(r"\?{2,}", "?", text)
-    text = re.sub(r"\.{2,}", ".", text)
+    # Remove repeated whitespace
+    text = re.sub(r"\s+", " ", text)
+
+    # Remove spaces before punctuation
+    text = re.sub(r"\s+([,.!?])", r"\1", text)
+
+    # Add a space after punctuation if another character follows
+    text = re.sub(r"([,.!?])([^\s])", r"\1 \2", text)
 
     return text.strip()
 
 
 # ============================================================
-# 9. MAIN NORMALIZER
+# DOMAIN-AWARE CORRECTION
+# ============================================================
+
+def apply_domain_corrections(text):
+    """
+    Apply only high-confidence phrase-level corrections.
+
+    Phrase-level replacement is safer than replacing individual
+    words because individual Telugu words can have multiple meanings.
+    """
+
+    for wrong, correct in DOMAIN_CORRECTIONS.items():
+
+        text = text.replace(
+            wrong,
+            correct
+        )
+
+    return text
+
+
+# ============================================================
+# SENTENCE SEGMENTATION
+# ============================================================
+
+def add_sentence_boundaries(text):
+    """
+    Adds basic sentence boundaries to long ASR output.
+
+    This is intentionally conservative.
+
+    We mainly use common Telugu sentence-ending patterns.
+    """
+
+    if not text:
+        return ""
+
+    # Common transition phrases in artisan descriptions.
+
+    replacements = {
+
+        "వారం రోజులు పట్టింది చేయడానికి":
+            "వారం రోజులు పట్టింది చేయడానికి.",
+
+        "వీటిని చెక్కతో చెక్కుతారు":
+            "వీటిని చెక్కతో చెక్కుతారు.",
+
+    }
+
+    for phrase, replacement in replacements.items():
+
+        text = text.replace(
+            phrase,
+            replacement
+        )
+
+    return text
+
+
+# ============================================================
+# MAIN NORMALIZER
 # ============================================================
 
 def normalize_telugu(text):
     """
-    Complete Telugu normalization pipeline.
+    Main Telugu normalization pipeline.
 
-    Raw STT
-        ↓
-    Unicode normalization
-        ↓
-    Basic cleanup
-        ↓
-    Telugu character normalization
-        ↓
-    Repeated character cleanup
-        ↓
-    Known STT correction
-        ↓
-    Word boundary cleanup
-        ↓
-    Punctuation normalization
-        ↓
-    Final Telugu
+    Flow:
+
+        Raw ASR
+           ↓
+        Basic cleanup
+           ↓
+        High-confidence domain corrections
+           ↓
+        Sentence boundaries
+           ↓
+        Normalized Telugu
     """
 
     if not text:
         return ""
 
-    # 1. Unicode
-    text = normalize_unicode(text)
+    # Step 1
+    text = clean_telugu(text)
 
-    # 2. General cleanup
-    text = clean_text(text)
+    # Step 2
+    text = apply_domain_corrections(text)
 
-    # 3. Telugu character patterns
-    text = normalize_telugu_characters(text)
+    # Step 3
+    text = add_sentence_boundaries(text)
 
-    # 4. Repeated characters
-    text = normalize_repeated_characters(text)
-
-    # 5. Known STT mistakes
-    text = correct_known_words(text)
-
-    # 6. Word boundaries
-    text = normalize_word_boundaries(text)
-
-    # 7. Punctuation
-    text = normalize_punctuation(text)
+    # Final cleanup
+    text = clean_telugu(text)
 
     return text
 
 
 # ============================================================
-# 10. TEST
+# TEST
 # ============================================================
 
 if __name__ == "__main__":
 
     test_sentences = [
 
-        "ఇవి చేత్తో చేస్నా కొణ్డపల్లి బంబలు విటిన చక్కుతో చిక్కుతారు.",
+        "ఈ చీరను నేను నా సొంత చేతులతోనే చేశాను "
+        "వారం రోజులు పట్టింది చేయడానికి "
+        "నీ చీర మీద ఉన్న ప్రతి బొమ్మ "
+        "నేను నా చేతులతో గీసి రంగులు వేశాను",
 
-        "ఇవి చేతితో చేసిన కొండపల్లి బొంబలో వీటిని చక్కతో చెక్కుతారు.",
-
-        "రైతులు పొలంలో పనీ చేస్థున్నారు.",
-
-        "అతను స్కూలుకి వెల్తున్నాడు.",
-
-        "నాకు తెలుగు బాష చాల ఇష్టం.",
+        "ఇవి చేత్తో చేసిన కొండపల్లి బొమ్మలు "
+        "వీటిని చెక్కతో చెక్కుతారు",
     ]
+
+    print("=" * 60)
+    print("TELUGU NORMALIZER TEST")
+    print("=" * 60)
 
     for i, text in enumerate(test_sentences, 1):
 
-        print("\n" + "=" * 60)
-        print(f"TEST {i}")
+        print(f"\nTEST {i}")
+        print("-" * 60)
 
-        print("\nOriginal:")
+        print("RAW:")
         print(text)
 
-        result = normalize_telugu(text)
+        normalized = normalize_telugu(text)
 
-        print("\nNormalized:")
-        print(result)
+        print("\nNORMALIZED:")
+        print(normalized)

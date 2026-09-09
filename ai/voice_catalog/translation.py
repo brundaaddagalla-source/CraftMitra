@@ -1,102 +1,254 @@
 import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-
-
-# ============================================================
-# MODEL
-# ============================================================
-
-MODEL_NAME = "facebook/nllb-200-distilled-600M"
+from IndicTransToolkit.processor import IndicProcessor
 
 
 # ============================================================
 # DEVICE
 # ============================================================
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-print(f"Using device: {device}")
+print(f"Translation device: {DEVICE}")
 
 
 # ============================================================
-# LOAD MODEL
+# ============================================================
+# 1. INDIC TRANS 2
+# TELUGU → ENGLISH
+# ============================================================
 # ============================================================
 
-tokenizer = AutoTokenizer.from_pretrained(
-    MODEL_NAME
+INDIC_MODEL = "ai4bharat/indictrans2-indic-en-1B"
+
+print("\nLoading IndicTrans2 Telugu → English...")
+
+indic_tokenizer = AutoTokenizer.from_pretrained(
+    INDIC_MODEL,
+    trust_remote_code=True
 )
 
-model = AutoModelForSeq2SeqLM.from_pretrained(
-    MODEL_NAME
+indic_model = AutoModelForSeq2SeqLM.from_pretrained(
+    INDIC_MODEL,
+    trust_remote_code=True,
+    torch_dtype=(
+        torch.float16
+        if DEVICE == "cuda"
+        else torch.float32
+    )
+).to(DEVICE)
+
+indic_model.eval()
+
+indic_processor = IndicProcessor(
+    inference=True
 )
 
-model = model.to(device)
+SRC_LANG = "tel_Telu"
+EN_LANG = "eng_Latn"
 
-model.eval()
-
-
-# ============================================================
-# LANGUAGE CODES
-# ============================================================
-
-LANGUAGE_CODES = {
-    "te": "tel_Telu",
-    "hi": "hin_Deva",
-    "en": "eng_Latn"
-}
+print("IndicTrans2 loaded successfully.")
 
 
 # ============================================================
-# TRANSLATION
+# TELUGU → ENGLISH FUNCTION
 # ============================================================
 
-def translate_to_english(text, source_language):
+def translate_to_english(
+    text,
+    source_language="te"
+):
 
-    if not text:
+    if not text or not text.strip():
         return ""
 
-    # Already English
-    if source_language == "en":
-        return text
+    # --------------------------------------------------------
+    # Check language
+    # --------------------------------------------------------
 
-    if source_language not in LANGUAGE_CODES:
+    if source_language != "te":
         raise ValueError(
-            f"Unsupported language: {source_language}"
+            "This translation function currently supports "
+            "Telugu (te) as the source language."
         )
 
-    source_code = LANGUAGE_CODES[source_language]
+    # --------------------------------------------------------
+    # IndicTrans2 language codes
+    # --------------------------------------------------------
 
-    tokenizer.src_lang = source_code
+    src_lang = "tel_Telu"
+    tgt_lang = "eng_Latn"
 
-    inputs = tokenizer(
-        text,
-        return_tensors="pt",
-        padding=True,
-        truncation=True
+    # --------------------------------------------------------
+    # Preprocess using official IndicTransToolkit
+    # --------------------------------------------------------
+
+    batch = indic_processor.preprocess_batch(
+        [text],
+        src_lang=src_lang,
+        tgt_lang=tgt_lang
     )
 
-    inputs = {
-        key: value.to(device)
-        for key, value in inputs.items()
-    }
+    # --------------------------------------------------------
+    # Tokenize
+    # --------------------------------------------------------
 
-    # Generate English translation
-    with torch.no_grad():
+    inputs = indic_tokenizer(
+        batch,
+        padding="longest",
+        truncation=True,
+        max_length=256,
+        return_tensors="pt"
+    ).to(DEVICE)
 
-        translated_tokens = model.generate(
+    # --------------------------------------------------------
+    # Generate
+    # --------------------------------------------------------
+
+    with torch.inference_mode():
+
+        generated_tokens = indic_model.generate(
             **inputs,
-            forced_bos_token_id=tokenizer.convert_tokens_to_ids(
-                "eng_Latn"
-            ),
+            num_beams=5,
             max_length=256
         )
 
-    translated_text = tokenizer.batch_decode(
-        translated_tokens,
+    # --------------------------------------------------------
+    # Decode
+    # --------------------------------------------------------
+
+    decoded = indic_tokenizer.batch_decode(
+        generated_tokens,
+        skip_special_tokens=True
+    )
+
+    # --------------------------------------------------------
+    # Postprocess
+    # --------------------------------------------------------
+
+    english = indic_processor.postprocess_batch(
+        decoded,
+        lang=tgt_lang
+    )[0]
+
+    return english.strip()
+
+
+# ============================================================
+# ============================================================
+# 2. NLLB
+# ENGLISH → HINDI
+# ============================================================
+# ============================================================
+
+NLLB_MODEL = "facebook/nllb-200-distilled-600M"
+
+print("\nLoading NLLB English → Hindi...")
+
+nllb_tokenizer = AutoTokenizer.from_pretrained(
+    NLLB_MODEL
+)
+
+nllb_model = AutoModelForSeq2SeqLM.from_pretrained(
+    NLLB_MODEL,
+    torch_dtype=(
+        torch.float16
+        if DEVICE == "cuda"
+        else torch.float32
+    )
+).to(DEVICE)
+
+nllb_model.eval()
+
+print("NLLB loaded successfully.")
+
+
+# ============================================================
+# ENGLISH → HINDI FUNCTION
+# ============================================================
+
+def translate_to_hindi(text):
+
+    if not text or not text.strip():
+        return ""
+
+    # --------------------------------------------------------
+    # Source language
+    # --------------------------------------------------------
+
+    nllb_tokenizer.src_lang = "eng_Latn"
+
+    # --------------------------------------------------------
+    # Tokenize
+    # --------------------------------------------------------
+
+    inputs = nllb_tokenizer(
+        text,
+        return_tensors="pt",
+        truncation=True,
+        max_length=256
+    ).to(DEVICE)
+
+    # --------------------------------------------------------
+    # Hindi language token
+    # --------------------------------------------------------
+
+    hindi_token_id = nllb_tokenizer.convert_tokens_to_ids(
+        "hin_Deva"
+    )
+
+    # --------------------------------------------------------
+    # Generate
+    # --------------------------------------------------------
+
+    with torch.inference_mode():
+
+        generated_tokens = nllb_model.generate(
+            **inputs,
+            forced_bos_token_id=hindi_token_id,
+            max_length=256,
+            num_beams=5
+        )
+
+    # --------------------------------------------------------
+    # Decode
+    # --------------------------------------------------------
+
+    hindi = nllb_tokenizer.batch_decode(
+        generated_tokens,
         skip_special_tokens=True
     )[0]
 
-    return translated_text.strip()
+    return hindi.strip()
+
+
+# ============================================================
+# COMPLETE TELUGU → ENGLISH → HINDI
+# ============================================================
+
+def translate_telugu(text):
+
+    if not text or not text.strip():
+        return {
+            "english": "",
+            "hindi": ""
+        }
+
+    # Telugu → English
+    english = translate_to_english(
+        text,
+        "te"
+    )
+
+    # English → Hindi
+    hindi = translate_to_hindi(
+        english
+    )
+
+    return {
+        "english": english,
+        "hindi": hindi
+    }
 
 
 # ============================================================
@@ -105,15 +257,39 @@ def translate_to_english(text, source_language):
 
 if __name__ == "__main__":
 
-    telugu_text = "ఇవి చేతితో తయారు చేసిన కొండపల్లి బొమ్మలు."
+    telugu_text = (
+        "ఈ చీరను నేను నా సొంత చేతులతోనే చేశాను "
+        "వారం రోజులు పట్టింది చేయడానికి. "
+        "ఈ చీర మీద ఉన్న ప్రతి బొమ్మ నేను నా చేతులతో "
+        "గీసి రంగులు వేశాను"
+    )
+
+    print("\n" + "=" * 60)
+    print("TRANSLATION TEST")
+    print("=" * 60)
+
+    print("\nTelugu:")
+    print(telugu_text)
+
+    # --------------------------------------------------------
+    # Telugu → English
+    # --------------------------------------------------------
 
     english = translate_to_english(
         telugu_text,
         "te"
     )
 
-    print("\n--- Telugu ---")
-    print(telugu_text)
-
-    print("\n--- English ---")
+    print("\nEnglish:")
     print(english)
+
+    # --------------------------------------------------------
+    # English → Hindi
+    # --------------------------------------------------------
+
+    hindi = translate_to_hindi(
+        english
+    )
+
+    print("\nHindi:")
+    print(hindi)
