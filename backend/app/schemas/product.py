@@ -29,6 +29,19 @@ class ProductWeight(BaseModel):
 
 
 # -----------------------------------------
+# MULTI-LANGUAGE DESCRIPTIONS
+# -----------------------------------------
+
+class ProductDescriptions(BaseModel):
+    regional: Optional[str] = None
+    english: Optional[str] = None
+    hindi: Optional[str] = None
+
+    # e.g. "Telugu" - which language `regional` is actually written in
+    regional_language_label: Optional[str] = None
+
+
+# -----------------------------------------
 # CRAFT DETAILS
 # -----------------------------------------
 
@@ -98,6 +111,9 @@ class ProductCreate(BaseModel):
     subcategory: Optional[str] = None
     description: Optional[str] = None
 
+    # Description in regional language / English / Hindi
+    descriptions: Optional[ProductDescriptions] = None
+
     # Craft information
     craft_details: CraftDetails
 
@@ -133,6 +149,8 @@ class ProductUpdate(BaseModel):
     subcategory: Optional[str] = None
     description: Optional[str] = None
 
+    descriptions: Optional[ProductDescriptions] = None
+
     craft_details: Optional[CraftDetails] = None
 
     pricing: Optional[ProductPricing] = None
@@ -164,6 +182,14 @@ class ProductResponse(BaseModel):
 
     subcategory: Optional[str] = None
     description: Optional[str] = None
+
+    descriptions: ProductDescriptions
+
+    # Primary product photo (from its ProductImage row, if any) - handy
+    # for list views like "My Products" that shouldn't need a second
+    # request per product just to show a thumbnail.
+    image_url: Optional[str] = None
+    enhanced_image_url: Optional[str] = None
 
     # Craft details
     craft_details: CraftDetails

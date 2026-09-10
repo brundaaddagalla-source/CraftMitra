@@ -68,7 +68,7 @@
 #             detail=str(error)
 #         )
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 from app.schemas.ai import AIProductProcessingResponse
 from app.services.ai_product_pipeline_service import process_product_audio
@@ -86,9 +86,13 @@ router = APIRouter(
 )
 async def process_product_audio_endpoint(
     audio_file: UploadFile = File(...),
+    # Which language the artisan actually spoke in the recording.
+    # Defaults to Telugu since that's what the pipeline was originally
+    # built and tested for.
+    language: str = Form("te"),
 ):
     try:
-        return await process_product_audio(audio_file)
+        return await process_product_audio(audio_file, language)
 
     except ValueError as error:
         raise HTTPException(

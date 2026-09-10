@@ -1,0 +1,136 @@
+/* ========================================
+   VOICE CAPTURE — additions on top of
+   addProduct.css (shared topbar/progress/
+   card/voice-area styles live there)
+======================================== */
+
+/* .image-uploading / .image-upload-error are positioned absolutely by
+   default (they were designed to float over the photo preview) - here
+   they sit inside a normal flex column, so drop that positioning. */
+.voice-inline-status {
+  position: static !important;
+  width: 100%;
+  margin-top: 14px;
+  box-sizing: border-box;
+}
+
+.spoken-language-picker {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #ece4d6;
+}
+
+.spoken-language-label {
+  display: block;
+  font-size: 10px;
+  color: #8d938d;
+  margin-bottom: 8px;
+}
+
+.spoken-language-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.spoken-language-option {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid #e7e0d4;
+  background: white;
+  color: #29372c;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.spoken-language-option.selected {
+  background: #c96a3d;
+  border-color: #c96a3d;
+  color: white;
+}
+
+.spoken-language-option:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.recorded-audio-card {
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 14px;
+  background: #faf7f0;
+  border: 1px solid #ece4d6;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.recorded-audio-info {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.recorded-audio-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #f7e5db;
+  color: #c96a3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.recorded-audio-info strong {
+  display: block;
+  font-size: 12px;
+  color: #29372c;
+}
+
+.recorded-audio-info span {
+  display: block;
+  margin-top: 2px;
+  font-size: 9px;
+  color: #8d938d;
+}
+
+.recorded-audio-player {
+  width: 100%;
+  height: 36px;
+}
+
+.recorded-audio-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.rerecord-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  background: white;
+  border: 1px solid #e7e0d4;
+  border-radius: 7px;
+  color: #667068;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.rerecord-button:hover:not(:disabled) {
+  border-color: #c96a3d;
+  color: #c96a3d;
+}
+
+.rerecord-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 720px) {
+  .recorded-audio-card {
+    padding: 14px;
+  }
+}

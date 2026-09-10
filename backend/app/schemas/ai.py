@@ -74,6 +74,12 @@ class AIProductProcessingResponse(BaseModel):
 
     raw_transcript: str | None = None
 
+    # Normalized transcript in the language the artisan actually spoke.
+    regional_text: str | None = None
+
+    # Deprecated alias of `regional_text`, only ever populated when
+    # `processed_language` is "te". Kept so older frontend builds that
+    # still read this field name don't break.
     normalized_telugu: str | None = None
 
     english: str | None = None
@@ -85,6 +91,11 @@ class AIProductProcessingResponse(BaseModel):
     extracted_product: AIExtractedProductData | None = None
 
     ai_generated_description: str | None = None
+
+    # Same AI-generated description, translated to Hindi - so the
+    # review screen can show the description in regional / English /
+    # Hindi without the artisan having to translate it themselves.
+    ai_generated_description_hindi: str | None = None
 
     ai_suggested_category: str | None = None
 

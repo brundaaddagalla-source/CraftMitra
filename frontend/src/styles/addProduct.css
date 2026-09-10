@@ -190,6 +190,14 @@
   gap: 17px;
 }
 
+/* Used while the flow only has one card (the photo) - the voice/story
+   card moves to its own screen in a later step. */
+.creation-grid.single-card {
+  grid-template-columns: 1fr;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
 .creation-card {
   background: #fffdf8;
   border: 1px solid #e7e0d4;
@@ -350,6 +358,55 @@
   align-items: center;
   gap: 5px;
   font-size: 9px;
+}
+
+.image-uploading {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: #4a4335;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+}
+
+.image-uploading .spin {
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.image-upload-error {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  background: #6b2a24;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+}
+
+.image-upload-error button {
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.18);
+  border: none;
+  color: white;
+  border-radius: 5px;
+  padding: 3px 8px;
+  font-size: 9px;
+  cursor: pointer;
 }
 
 

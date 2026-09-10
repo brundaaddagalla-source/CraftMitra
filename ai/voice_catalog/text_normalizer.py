@@ -414,3 +414,50 @@ def normalize_telugu(text):
     text = add_final_period(text)
 
     return text
+
+
+# ============================================================
+# GENERIC (NON-TELUGU) CLEANUP
+# ============================================================
+# For spoken languages that don't have a dedicated ASR-correction
+# list yet, we still want basic whitespace/punctuation cleanup -
+# just without the Telugu-specific word/phrase corrections and
+# sentence-boundary phrase list above, which would do nothing
+# useful (and could even misfire) on non-Telugu text.
+# ============================================================
+
+def clean_generic(text):
+    """
+    Script-agnostic cleanup: whitespace, repeated words,
+    punctuation, and a trailing period. No language-specific
+    corrections are applied.
+    """
+
+    if not text:
+        return ""
+
+    text = clean_telugu(text)  # purely regex-based, not Telugu-specific
+    text = remove_repeated_words(text)
+    text = clean_punctuation(text)
+    text = add_final_period(text)
+
+    return text
+
+
+# ============================================================
+# LANGUAGE-AWARE NORMALIZER
+# ============================================================
+
+def normalize_transcript(text, language="te"):
+    """
+    Normalize a raw ASR transcript for the given spoken language.
+
+    Telugu gets the full CraftMitra normalizer (ASR corrections
+    tuned from real artisan recordings). Every other supported
+    language currently gets generic cleanup only.
+    """
+
+    if language == "te":
+        return normalize_telugu(text)
+
+    return clean_generic(text)

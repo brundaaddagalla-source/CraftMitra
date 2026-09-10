@@ -3,9 +3,18 @@ from pathlib import Path
 
 # Make `backend/` importable as the root for `app.*` imports,
 # even when the process is launched from the project root.
-_BACKEND_DIR = Path(__file__).resolve().parent.parent  # .../proj3/backend
+_BACKEND_DIR = Path(__file__).resolve().parent.parent  # .../CraftMitra/backend
 if str(_BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(_BACKEND_DIR))
+
+# The `ai` package (voice_catalog, image_enhancement, product_ai, ...)
+# lives as a sibling of `backend/`, not inside it - e.g.
+# ai_product_pipeline_service.py does `from ai.voice_catalog...`.
+# Add the project root too, so that import resolves no matter which
+# directory uvicorn was launched from.
+_PROJECT_ROOT = _BACKEND_DIR.parent  # .../CraftMitra
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -37,10 +46,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

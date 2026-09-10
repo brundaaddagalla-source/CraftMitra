@@ -1,0 +1,122 @@
+/* ================================
+   CRAFTMITRA SIGNUP
+   Mobile-first, large-type, earthy design
+================================ */
+
+.signup-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7f3ea;
+  padding: 24px 16px;
+}
+
+.signup-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px 24px;
+  box-shadow: 0 8px 24px rgba(41, 55, 44, 0.08);
+}
+
+.signup-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.signup-brand-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #294332;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.signup-brand h1 {
+  font-size: 24px;
+  color: #29372c;
+  margin: 0;
+}
+
+.signup-subtitle {
+  font-size: 17px;
+  color: #55604f;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.signup-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 17px;
+  font-weight: 600;
+  color: #29372c;
+}
+
+.signup-form input {
+  font-size: 18px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1.5px solid #d8d0bd;
+  background: #f7f3ea;
+  color: #29372c;
+}
+
+.signup-form input:focus {
+  outline: none;
+  border-color: #294332;
+}
+
+.signup-error {
+  font-size: 15px;
+  color: #b3261e;
+  background: #fdecea;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin: 0;
+}
+
+.signup-submit {
+  font-size: 19px;
+  font-weight: 700;
+  padding: 16px;
+  border-radius: 14px;
+  border: none;
+  background: #294332;
+  color: #ffffff;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.signup-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Larger tap targets, slightly tighter padding on small screens */
+@media (max-width: 480px) {
+  .signup-card {
+    padding: 28px 18px;
+    border-radius: 16px;
+  }
+
+  .signup-form input {
+    font-size: 17px;
+    padding: 13px 14px;
+  }
+}

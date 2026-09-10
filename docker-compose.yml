@@ -1,0 +1,14 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app/backend
+      - ./ai:/app/ai
+    env_file:
+      - ./backend/.env
+    environment:
+      - PYTHONUNBUFFERED=1

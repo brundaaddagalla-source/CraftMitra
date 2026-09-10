@@ -191,6 +191,16 @@
 
 /* EMPTY */
 
+.spin {
+  animation: myProductsSpin 0.8s linear infinite;
+}
+
+@keyframes myProductsSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .empty-products {
   background: #fffdf8;
   border: 1px solid #e6ded1;

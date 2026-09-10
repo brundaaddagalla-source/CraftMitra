@@ -1,0 +1,56 @@
+# --- Core backend (FastAPI + DB + auth) ---
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg[binary]
+pydantic
+pydantic-settings
+PyJWT
+bcrypt
+python-dotenv==1.2.3
+python-multipart
+email-validator
+supabase==2.31.0
+
+# --- Translation / voice-catalog AI (transformers, IndicTrans) ---
+transformers==4.51.3
+accelerate
+sentencepiece
+safetensors
+huggingface_hub
+IndicTransToolkit
+onnxruntime
+
+# --- Audio processing ---
+soundfile
+librosa
+
+# --- Image AI (enhancement / background removal) ---
+backgroundremover==0.4.5
+opencv-python==4.11.0.86
+pillow==11.3.0
+pillow_heif==1.7.0
+scikit-image==0.26.0
+PyMatting==1.1.16
+imageio==2.37.4
+imageio-ffmpeg==0.6.0
+ffmpeg-python==0.2.0
+moviepy==2.2.1
+
+# --- Shared numeric / ML stack ---
+torch==2.14.0
+torchaudio
+torchvision==0.29.0
+numpy==2.5.3
+scipy==1.18.1
+numba==0.67.0
+llvmlite==0.49.0
+
+# --- Misc transitive deps pinned from your working venv ---
+Flask==3.1.3
+Werkzeug==3.1.8
+waitress==3.0.2
+requests==2.34.2
+filetype==1.2.0
+proglog==0.1.12
+tqdm==4.70.0

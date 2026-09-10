@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   ArrowLeft,
@@ -6,7 +6,9 @@ import {
   Plus,
   X,
   Save,
-  RotateCcw
+  RotateCcw,
+  Image as ImageIcon,
+  Wand2
 } from "lucide-react";
 
 import {
@@ -17,6 +19,9 @@ import {
 import "../styles/editProduct.css";
 import { useLanguage } from "../context/LanguageContext";
 
+// Same placeholder used by Step 9 - dynamic pricing isn't built yet.
+const DEFAULT_PRICE = 250;
+
 function EditProduct() {
 
   const navigate = useNavigate();
@@ -24,12 +29,25 @@ function EditProduct() {
 
   const { t } = useLanguage();
 
+  const productId = location.state?.productId;
+  const imageId = location.state?.imageId;
+  const voiceResult = location.state?.voiceResult;
+
   const previousProduct =
     location.state?.product || {};
 
-  const productImage =
+  // Real photos from Steps 3-5: the original upload, and the AI
+  // enhanced version (may be missing if enhancement failed/was
+  // skipped - see the "continue with original photo" path in
+  // AIProcessing.jsx).
+  const originalImage =
     location.state?.image ||
     previousProduct.image ||
+    null;
+
+  const enhancedImage =
+    location.state?.enhancedImage ||
+    previousProduct.enhancedImage ||
     null;
 
   const story =
@@ -42,6 +60,16 @@ function EditProduct() {
     previousProduct.language ||
     "English";
 
+  // Which photo is currently shown - defaults to the enhanced one
+  // when we have it, since that's the point of Step 4/5.
+  const [showEnhanced, setShowEnhanced] =
+    useState(Boolean(enhancedImage));
+
+  const displayedImage =
+    showEnhanced && enhancedImage
+      ? enhancedImage
+      : originalImage;
+
 
   const [productName, setProductName] =
     useState(
@@ -49,10 +77,63 @@ function EditProduct() {
     );
 
 
-  const [description, setDescription] =
-    useState(
-      t(previousProduct.description || story || "")
-    );
+  // -------------------------------------------------------
+  // DESCRIPTION - in regional language / English / Hindi
+  // -------------------------------------------------------
+  // The AI description generator only produces English text (no
+  // model to compose it in the artisan's own language yet), so the
+  // "regional" tab shows the artisan's own normalized words instead
+  // of pretending it's an AI translation. Each tab is independently
+  // editable since the artisan may want to word things differently
+  // per language.
+
+  const regionalLabel =
+    previousProduct.regionalLanguageLabel ||
+    language ||
+    "Regional";
+
+  const initialDescriptions =
+    previousProduct.descriptions || {
+      regional: previousProduct.description || story || "",
+      english: previousProduct.description || story || "",
+      hindi: ""
+    };
+
+  const [descriptions, setDescriptions] =
+    useState(initialDescriptions);
+
+  const languageTabs = useMemo(() => {
+    const tabs = [];
+
+    // Skip a separate "regional" tab when the artisan already spoke
+    // English - it would just duplicate the English tab.
+    if (
+      regionalLabel &&
+      regionalLabel.toLowerCase() !== "english" &&
+      descriptions.regional
+    ) {
+      tabs.push({ key: "regional", label: t(regionalLabel) });
+    }
+
+    tabs.push({ key: "english", label: t("English") });
+
+    if (descriptions.hindi) {
+      tabs.push({ key: "hindi", label: t("Hindi") });
+    }
+
+    return tabs;
+  }, [regionalLabel, descriptions.regional, descriptions.hindi, t]);
+
+  const [activeLang, setActiveLang] = useState(
+    languageTabs.some((tab) => tab.key === "english") ? "english" : languageTabs[0]?.key
+  );
+
+  const updateActiveDescription = (value) => {
+    setDescriptions((prev) => ({
+      ...prev,
+      [activeLang]: value
+    }));
+  };
 
 
   const [category, setCategory] =
@@ -94,7 +175,7 @@ function EditProduct() {
     useState(
       String(
         previousProduct.price ||
-        "2599"
+        DEFAULT_PRICE
       ).replace("₹", "")
     );
 
@@ -130,7 +211,7 @@ function EditProduct() {
 
 
   // =====================================================
-  // SAVE
+  // SAVE -> continue to Publish (Step 11)
   // =====================================================
 
   const handleSave = () => {
@@ -141,13 +222,20 @@ function EditProduct() {
 
       id:
         previousProduct.id ||
-        Date.now(),
+        productId,
 
       name:
         productName.trim(),
 
+      // Keep the canonical single-language description in sync with
+      // whichever tab the artisan was last editing, but carry the
+      // full multi-language set forward too.
       description:
-        description.trim(),
+        descriptions[activeLang]?.trim() || "",
+
+      descriptions,
+
+      regionalLanguageLabel: regionalLabel,
 
       category,
 
@@ -166,11 +254,13 @@ function EditProduct() {
         `₹${price}`,
 
       confidence:
-        previousProduct.confidence ||
-        94,
+        previousProduct.confidence ??
+        null,
 
       image:
-        productImage,
+        originalImage,
+
+      enhancedImage,
 
       story,
 
@@ -179,12 +269,16 @@ function EditProduct() {
 
 
     navigate(
-      "/product-catalog",
+      "/publish",
       {
         state: {
 
+          productId,
+          imageId,
+          voiceResult,
+
           image:
-            productImage,
+            displayedImage,
 
           story,
 
@@ -199,6 +293,15 @@ function EditProduct() {
   };
 
 
+  const backTarget = () =>
+    navigate(
+      "/add-product",
+      {
+        replace: true
+      }
+    );
+
+
   return (
 
     <div className="edit-product-page">
@@ -209,19 +312,7 @@ function EditProduct() {
 
         <button
           className="edit-back-button"
-          onClick={() =>
-            navigate(
-              "/product-catalog",
-              {
-                state: {
-                  image: productImage,
-                  product: previousProduct,
-                  story,
-                  language
-                }
-              }
-            )
-          }
+          onClick={backTarget}
         >
 
           <ArrowLeft size={16} />
@@ -284,10 +375,10 @@ function EditProduct() {
 
             <div className="edit-image-placeholder">
 
-              {productImage ? (
+              {displayedImage ? (
 
                 <img
-                  src={productImage}
+                  src={displayedImage}
                   alt={t(productName)}
                   className="edit-product-image"
                 />
@@ -311,13 +402,58 @@ function EditProduct() {
             </div>
 
 
-            <div className="enhanced-badge">
+            {showEnhanced && enhancedImage && (
 
-              <Sparkles size={12} />
+              <div className="enhanced-badge">
 
-              {t("AI enhanced")}
+                <Sparkles size={12} />
 
-            </div>
+                {t("AI enhanced")}
+
+              </div>
+
+            )}
+
+
+            {/* ORIGINAL / ENHANCED TOGGLE */}
+
+            {originalImage && (
+
+              <div className="image-toggle">
+
+                <button
+                  type="button"
+                  className={!showEnhanced || !enhancedImage ? "selected" : ""}
+                  onClick={() => setShowEnhanced(false)}
+                >
+                  <ImageIcon size={12} />
+                  {t("Original")}
+                </button>
+
+                <button
+                  type="button"
+                  className={showEnhanced && enhancedImage ? "selected" : ""}
+                  onClick={() => enhancedImage && setShowEnhanced(true)}
+                  disabled={!enhancedImage}
+                >
+                  <Wand2 size={12} />
+                  {t("AI Enhanced")}
+                </button>
+
+              </div>
+
+            )}
+
+
+            {!enhancedImage && (
+
+              <p className="image-toggle-note">
+                {t(
+                  "Enhancement isn't available for this photo - showing the original."
+                )}
+              </p>
+
+            )}
 
           </div>
 
@@ -384,12 +520,13 @@ function EditProduct() {
                   e.target.value
                 )
               }
+              placeholder={t("Give your product a name")}
             />
 
           </div>
 
 
-          {/* DESCRIPTION */}
+          {/* DESCRIPTION - LANGUAGE TABS */}
 
           <div className="form-field">
 
@@ -397,19 +534,38 @@ function EditProduct() {
               {t("Description")}
             </label>
 
+            {languageTabs.length > 1 && (
+
+              <div className="description-lang-tabs">
+
+                {languageTabs.map((tab) => (
+
+                  <button
+                    key={tab.key}
+                    type="button"
+                    className={activeLang === tab.key ? "selected" : ""}
+                    onClick={() => setActiveLang(tab.key)}
+                  >
+                    {tab.label}
+                  </button>
+
+                ))}
+
+              </div>
+
+            )}
+
             <textarea
-              value={description}
+              value={descriptions[activeLang] || ""}
               onChange={(e) =>
-                setDescription(
-                  e.target.value
-                )
+                updateActiveDescription(e.target.value)
               }
               rows="5"
             />
 
             <span className="character-count">
 
-              {description.length} {t("characters")}
+              {(descriptions[activeLang] || "").length} {t("characters")}
 
             </span>
 
@@ -626,24 +782,7 @@ function EditProduct() {
 
             <button
               className="cancel-edit"
-              onClick={() =>
-                navigate(
-                  "/product-catalog",
-                  {
-                    state: {
-                      image:
-                        productImage,
-
-                      product:
-                        previousProduct,
-
-                      story,
-
-                      language
-                    }
-                  }
-                )
-              }
+              onClick={backTarget}
             >
 
               <RotateCcw size={14} />
@@ -660,7 +799,7 @@ function EditProduct() {
 
               <Save size={15} />
 
-              {t("Save Changes")}
+              {t("Continue to Publish")}
 
             </button>
 

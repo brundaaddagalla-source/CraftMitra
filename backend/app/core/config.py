@@ -92,6 +92,16 @@ class Settings(BaseSettings):
 
 
     # -----------------------------------------
+    # CORS
+    # -----------------------------------------
+
+    # Comma-separated list of allowed frontend origins.
+    # Local dev defaults cover Vite's default port; add the deployed
+    # frontend URL here (via the .env file) before going live.
+    CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173"
+
+
+    # -----------------------------------------
     # SUPABASE
     # -----------------------------------------
 
@@ -116,6 +126,14 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore"
     )
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        return [
+            origin.strip()
+            for origin in self.CORS_ORIGINS.split(",")
+            if origin.strip()
+        ]
 
 
 settings = Settings()

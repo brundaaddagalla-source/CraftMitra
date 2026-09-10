@@ -421,3 +421,81 @@
   border-radius: 12px;
   display: block;
 }
+/* =========================================
+   ORIGINAL / AI ENHANCED IMAGE TOGGLE
+========================================= */
+
+.image-toggle {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.image-toggle button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  padding: 8px 10px;
+
+  border: 1px solid #e6ded1;
+  border-radius: 9px;
+
+  background: #fffdf8;
+  color: #7c817a;
+
+  font-size: 9px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.image-toggle button.selected {
+  background: #294332;
+  border-color: #294332;
+  color: white;
+}
+
+.image-toggle button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.image-toggle-note {
+  margin: 10px 2px 0;
+  color: #a2a49e;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+
+/* =========================================
+   DESCRIPTION LANGUAGE TABS
+========================================= */
+
+.description-lang-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.description-lang-tabs button {
+  padding: 5px 10px;
+
+  border: 1px solid #ddd6ca;
+  border-radius: 20px;
+
+  background: #fffdf8;
+  color: #7c817a;
+
+  font-size: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.description-lang-tabs button.selected {
+  background: #f1e5d7;
+  border-color: #e5c9a8;
+  color: #b7603b;
+}

@@ -65,6 +65,37 @@ def create_new_artisan(
         )
 
 # -----------------------------------------
+# GET MY OWN ARTISAN PROFILE
+# -----------------------------------------
+#
+# Registered before the "/{artisan_id}" route so that the literal
+# path "/artisans/me" isn't swallowed by the int path param above.
+# The frontend needs this right after login/signup to learn its own
+# artisan_id - it has no other way to look that up.
+
+@router.get(
+    "/me",
+    response_model=ArtisanResponse
+)
+def get_my_artisan_profile(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_artisan)
+):
+    artisan = artisan_service.get_artisan_by_user_id(
+        db,
+        current_user.id
+    )
+
+    if not artisan:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Artisan profile does not exist"
+        )
+
+    return artisan
+
+
+# -----------------------------------------
 # GET ARTISAN BY ID
 # -----------------------------------------
 

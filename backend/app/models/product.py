@@ -51,6 +51,39 @@ class Product(Base):
         nullable=True
     )
 
+    # -------------------------------------
+    # MULTI-LANGUAGE DESCRIPTIONS
+    # -------------------------------------
+    # The voice pipeline produces the artisan's story in their own
+    # spoken (regional) language, plus English and Hindi translations.
+    # `description` above stays as the single "canonical" copy (whichever
+    # language tab the artisan was last editing on the review screen),
+    # while these three keep every language around so the listing can
+    # still show/edit all of them later.
+
+    description_regional: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True
+    )
+
+    description_english: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True
+    )
+
+    description_hindi: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True
+    )
+
+    # Human-readable label for whichever language `description_regional`
+    # is actually written in (e.g. "Telugu"), since "regional" itself
+    # isn't a language.
+    regional_language_label: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True
+    )
+
     # Craft information
     craft_type: Mapped[str] = mapped_column(
         String(100),

@@ -64,6 +64,20 @@ def product_to_response(product: Product):
     into the nested frontend API structure.
     """
 
+    # Prefer the primary image if one's been flagged as such, otherwise
+    # fall back to the earliest-uploaded image - in practice the "Add
+    # Product" flow only ever attaches a single photo per product.
+    primary_image = None
+
+    if product.images:
+        primary_image = sorted(
+            product.images,
+            key=lambda image: (
+                not image.is_primary,
+                image.created_at
+            )
+        )[0]
+
     return {
         "id": product.id,
         "artisan_id": product.artisan_id,
@@ -72,6 +86,20 @@ def product_to_response(product: Product):
         "category": product.category,
         "subcategory": product.subcategory,
         "description": product.description,
+
+        "descriptions": {
+            "regional": product.description_regional,
+            "english": product.description_english,
+            "hindi": product.description_hindi,
+            "regional_language_label": product.regional_language_label
+        },
+
+        "image_url": (
+            primary_image.image_url if primary_image else None
+        ),
+        "enhanced_image_url": (
+            primary_image.enhanced_image_url if primary_image else None
+        ),
 
         "craft_details": {
             "craft_type": product.craft_type,
@@ -148,6 +176,7 @@ def create_product(
     # -------------------------------------
 
     craft = product_data.craft_details
+    descriptions = product_data.descriptions
 
     pricing = product_data.pricing
     inventory = product_data.inventory
@@ -166,6 +195,20 @@ def create_product(
         category=product_data.category,
         subcategory=product_data.subcategory,
         description=product_data.description,
+
+        # Multi-language descriptions
+        description_regional=(
+            descriptions.regional if descriptions else None
+        ),
+        description_english=(
+            descriptions.english if descriptions else None
+        ),
+        description_hindi=(
+            descriptions.hindi if descriptions else None
+        ),
+        regional_language_label=(
+            descriptions.regional_language_label if descriptions else None
+        ),
 
         # Craft information
         craft_type=craft.craft_type or product_data.category,
@@ -323,6 +366,28 @@ def update_product(
                 field,
                 update_data[field]
             )
+
+    # -------------------------------------
+    # MULTI-LANGUAGE DESCRIPTIONS
+    # -------------------------------------
+
+    if "descriptions" in update_data:
+        descriptions = update_data["descriptions"]
+
+        if descriptions is not None:
+            if "regional" in descriptions:
+                product.description_regional = descriptions["regional"]
+
+            if "english" in descriptions:
+                product.description_english = descriptions["english"]
+
+            if "hindi" in descriptions:
+                product.description_hindi = descriptions["hindi"]
+
+            if "regional_language_label" in descriptions:
+                product.regional_language_label = descriptions[
+                    "regional_language_label"
+                ]
 
     # -------------------------------------
     # CRAFT DETAILS

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   ArrowLeft,
@@ -8,7 +8,8 @@ import {
   Store,
   ShoppingBag,
   Globe,
-  Send
+  Send,
+  AlertCircle
 } from "lucide-react";
 
 import {
@@ -18,6 +19,7 @@ import {
 
 import "../styles/publishProduct.css";
 import { useLanguage } from "../context/LanguageContext";
+import { api } from "../api/client";
 
 const marketplaces = [
   {
@@ -43,11 +45,34 @@ const marketplaces = [
   }
 ];
 
+// Same placeholder used by Steps 8-10 - dynamic pricing isn't built yet,
+// so this is what "AI suggested" means until a real model exists.
+const DEFAULT_SUGGESTED_PRICE = 250;
+
+// Turns "₹1,250" / "1250" / 1250 into a plain number the backend's
+// Decimal fields can parse. Falls back to the placeholder if the
+// artisan somehow left the price field empty.
+function parsePrice(value) {
+  const cleaned = String(value ?? "").replace(/[^0-9.]/g, "");
+  const parsed = parseFloat(cleaned);
+  return Number.isFinite(parsed) ? parsed : DEFAULT_SUGGESTED_PRICE;
+}
+
 function PublishProduct() {
 
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLanguage();
+
+  // Real IDs threaded through from Steps 1-10 - PublishProduct doesn't
+  // create a new product, it PATCHes the draft row that was already
+  // created the moment the artisan took their first photo.
+  const productId = location.state?.productId;
+  const imageId = location.state?.imageId;
+  const voiceResult = location.state?.voiceResult;
+
+  const product = location.state?.product;
+  const productImage = location.state?.image;
 
   const [selectedMarketplace, setSelectedMarketplace] =
     useState("craftmitra");
@@ -58,78 +83,113 @@ function PublishProduct() {
   const [published, setPublished] =
     useState(false);
 
+  const [publishError, setPublishError] =
+    useState("");
 
-  // Get actual product from Product Catalog
-  const product =
-    location.state?.product || {
-      name: "Handwoven Cotton Saree",
-      category: "Handloom",
-      material: "Cotton",
-      technique: "Traditional Hand Weaving",
-      color: "Indigo",
-      description:
-        "A beautiful handcrafted product created by an artisan.",
-      price: "₹2,599",
-      tags: [
-        "Handloom",
-        "Handcrafted"
-      ],
-      confidence: 94
-    };
+  const [publishedProduct, setPublishedProduct] =
+    useState(null);
 
 
-  const productImage =
-    location.state?.image;
+  // This screen only makes sense at the end of the Steps 1-10 flow -
+  // if someone lands here directly (refresh, deep link, back/forward
+  // nav after the state is gone), there's nothing real to publish.
+  const hasRequiredState = Boolean(productId && product);
+
+  useEffect(() => {
+    if (!hasRequiredState) {
+      navigate("/add-product", { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
 
     setPublishing(true);
+    setPublishError("");
 
-    setTimeout(() => {
+    try {
 
-      const existingProducts =
-        JSON.parse(
-          localStorage.getItem("myProducts")
-        ) || [];
+      const descriptions = product.descriptions || {};
 
+      // The single canonical description (whichever language tab the
+      // artisan was last editing on the review screen) stays the
+      // "main" description; the full set of languages goes along too
+      // so the listing can still show/edit all of them later.
+      const payload = {
+        product_name: product.name,
+        category: product.category,
+        description: product.description,
 
-      const newProduct = {
+        descriptions: {
+          regional: descriptions.regional || null,
+          english: descriptions.english || null,
+          hindi: descriptions.hindi || null,
+          regional_language_label:
+            product.regionalLanguageLabel || product.language || null
+        },
 
-        ...product,
+        craft_details: {
+          craft_type: product.category,
+          craft_technique: product.technique || null,
+          material: product.material || null,
+          color: product.color || null
+        },
 
-        id: Date.now(),
+        pricing: {
+          suggested_price: DEFAULT_SUGGESTED_PRICE,
+          final_price: parsePrice(product.price)
+        },
 
-        image: productImage || "",
+        original_language: product.language || null,
 
-        status: "Published",
+        voice_input: {
+          transcript:
+            product.story ||
+            voiceResult?.regional_text ||
+            null,
+          audio_url: null
+        },
 
-        marketplace: selectedMarketplace,
+        ai: {
+          generated_description: descriptions.english || null,
+          suggested_category: product.category || null,
+          confidence:
+            product.confidence != null
+              ? product.confidence / 100
+              : null
+        },
 
-        publishedAt:
-          new Date().toISOString()
-
+        status: "published"
       };
 
-
-      const updatedProducts = [
-        ...existingProducts,
-        newProduct
-      ];
-
-
-      localStorage.setItem(
-        "myProducts",
-        JSON.stringify(updatedProducts)
+      const saved = await api.patch(
+        `/products/${productId}`,
+        payload
       );
 
-
-      setPublishing(false);
-
+      setPublishedProduct(saved);
       setPublished(true);
 
-    }, 1500);
+    } catch (error) {
+      console.error(error);
+      setPublishError(
+        error.message ||
+        t("Couldn't publish your product. Please try again.")
+      );
+    } finally {
+      setPublishing(false);
+    }
   };
+
+
+  if (!hasRequiredState) {
+    return (
+      <div className="publish-missing-state">
+        {t("Redirecting...")}
+      </div>
+    );
+  }
 
 
   if (published) {
@@ -188,7 +248,7 @@ function PublishProduct() {
 
                 <img
                   src={productImage}
-                  alt={t(product.name)}
+                  alt={t(publishedProduct?.product_name || product.name)}
                   style={{
                     width: "100%",
                     height: "100%",
@@ -207,11 +267,12 @@ function PublishProduct() {
             <div>
 
               <strong>
-                {t(product.name)}
+                {t(publishedProduct?.product_name || product.name)}
               </strong>
 
               <span>
-                {t(product.category)} • {product.price}
+                {t(publishedProduct?.category || product.category)} •{" "}
+                ₹{publishedProduct?.pricing?.final_price ?? parsePrice(product.price)}
               </span>
 
             </div>
@@ -251,9 +312,15 @@ function PublishProduct() {
         <button
           className="publish-back-button"
           onClick={() =>
-            navigate("/product-catalog", {
+            navigate("/edit-product", {
               state: {
-                image: productImage,
+                productId,
+                imageId,
+                voiceResult,
+                image: product.image || productImage,
+                enhancedImage: product.enhancedImage,
+                story: product.story,
+                language: product.language,
                 product: product
               }
             })
@@ -374,7 +441,7 @@ function PublishProduct() {
             <div className="preview-bottom">
 
               <strong>
-                {product.price}
+                ₹{parsePrice(product.price)}
               </strong>
 
 
@@ -556,6 +623,16 @@ function PublishProduct() {
             )}
 
           </button>
+
+
+          {publishError && (
+
+            <div className="publish-error-banner">
+              <AlertCircle size={14} />
+              {publishError}
+            </div>
+
+          )}
 
 
           <p className="publish-note">

@@ -6,46 +6,124 @@ import {
   Trash2,
   CheckCircle,
   IndianRupee,
-  ShoppingBag,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
+import { useAuth } from "../context/AuthContext";
+import { api } from "../api/client";
 import "../styles/myProducts.css";
+
+// Turns the nested API shape (Step 11's ProductResponse) into the flat
+// shape the rest of these pages (ProductCatalog, EditProduct) already
+// expect from `location.state.product`.
+function toDisplayProduct(apiProduct) {
+  const descriptions = apiProduct.descriptions || {};
+
+  const price =
+    apiProduct.pricing?.final_price ??
+    apiProduct.pricing?.suggested_price ??
+    null;
+
+  return {
+    id: apiProduct.id,
+    name: apiProduct.product_name,
+    category: apiProduct.category,
+    description: apiProduct.description,
+    descriptions: {
+      regional: descriptions.regional || "",
+      english: descriptions.english || "",
+      hindi: descriptions.hindi || "",
+    },
+    regionalLanguageLabel: descriptions.regional_language_label || "",
+    material: apiProduct.craft_details?.material || "",
+    technique: apiProduct.craft_details?.craft_technique || "",
+    color: apiProduct.craft_details?.color || "",
+    tags: [],
+    price: price != null ? `₹${price}` : "₹0",
+    confidence:
+      apiProduct.ai?.confidence != null
+        ? Math.round(apiProduct.ai.confidence * 100)
+        : null,
+    image: apiProduct.image_url || null,
+    enhancedImage: apiProduct.enhanced_image_url || null,
+    language: apiProduct.original_language || "",
+    status: apiProduct.status,
+  };
+}
 
 function MyProducts() {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { user } = useAuth();
 
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [deletingId, setDeletingId] = useState(null);
 
   // =====================================================
-  // LOAD ALL PUBLISHED PRODUCTS
+  // LOAD PUBLISHED PRODUCTS FROM THE BACKEND
   // =====================================================
+
+  const loadProducts = async () => {
+    if (!user?.artisanId) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setLoadError("");
+
+    try {
+      const results = await api.get(
+        `/products/artisan/${user.artisanId}`
+      );
+
+      // Drafts abandoned mid-flow (photo taken but never confirmed on
+      // the Publish screen) shouldn't clutter "My Products" - this
+      // page is about what's actually live, per Step 11.
+      const publishedOnly = (results || []).filter(
+        (item) => item.status === "published"
+      );
+
+      setProducts(publishedOnly.map(toDisplayProduct));
+    } catch (error) {
+      console.error(error);
+      setLoadError(
+        error.message || t("Couldn't load your products. Please try again.")
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const savedProducts =
-      JSON.parse(localStorage.getItem("myProducts")) || [];
-
-    setProducts(savedProducts);
-  }, []);
+    loadProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.artisanId]);
 
   // =====================================================
   // DELETE PRODUCT
   // =====================================================
 
-  const deleteProduct = (id) => {
-    const updatedProducts = products.filter(
-      (product) => product.id !== id
-    );
+  const deleteProduct = async (id) => {
+    setDeletingId(id);
 
-    setProducts(updatedProducts);
-
-    localStorage.setItem(
-      "myProducts",
-      JSON.stringify(updatedProducts)
-    );
+    try {
+      await api.delete(`/products/${id}`);
+      setProducts((prev) => prev.filter((product) => product.id !== id));
+    } catch (error) {
+      console.error(error);
+      alert(
+        error.message || t("Couldn't delete this product. Please try again.")
+      );
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   // =====================================================
@@ -55,10 +133,10 @@ function MyProducts() {
   const viewProduct = (product) => {
     navigate("/product-catalog", {
       state: {
-        image: product.image,
+        image: product.enhancedImage || product.image,
         story: product.story || "",
-        product: product
-      }
+        product: product,
+      },
     });
   };
 
@@ -69,10 +147,13 @@ function MyProducts() {
   const editProduct = (product) => {
     navigate("/edit-product", {
       state: {
+        productId: product.id,
         image: product.image,
+        enhancedImage: product.enhancedImage,
         story: product.story || "",
-        product: product
-      }
+        language: product.language,
+        product: product,
+      },
     });
   };
 
@@ -139,7 +220,37 @@ function MyProducts() {
 
         <div className="products-container">
 
-          {products.length === 0 ? (
+          {loading ? (
+
+            <div className="empty-products">
+
+              <div className="empty-icon">
+                <Loader2 size={28} className="spin" />
+              </div>
+
+              <h2>{t("Loading your products...")}</h2>
+
+            </div>
+
+          ) : loadError ? (
+
+            <div className="empty-products">
+
+              <div className="empty-icon">
+                <AlertCircle size={28} />
+              </div>
+
+              <h2>{t("Something went wrong")}</h2>
+
+              <p>{loadError}</p>
+
+              <button onClick={loadProducts}>
+                {t("Try Again")}
+              </button>
+
+            </div>
+
+          ) : products.length === 0 ? (
 
             <div className="empty-products">
 
@@ -175,10 +286,10 @@ function MyProducts() {
 
                   <div className="my-product-image">
 
-                    {product.image ? (
+                    {product.enhancedImage || product.image ? (
 
                       <img
-                        src={product.image}
+                        src={product.enhancedImage || product.image}
                         alt={t(product.name || "Product")}
                       />
 
@@ -194,7 +305,7 @@ function MyProducts() {
 
                       <CheckCircle size={11} />
 
-                      {t(product.status || "Published")}
+                      {t("Published")}
 
                     </span>
 
@@ -275,6 +386,7 @@ function MyProducts() {
                         onClick={() =>
                           deleteProduct(product.id)
                         }
+                        disabled={deletingId === product.id}
                       >
                         <Trash2 size={14} />
                       </button>

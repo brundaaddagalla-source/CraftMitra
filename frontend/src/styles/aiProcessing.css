@@ -514,6 +514,111 @@
 
 
 /* =========================================
+   STALLED STEP (image enhancement failed/timed out)
+========================================= */
+
+.processing-step.stalled {
+  background: #fbeeea;
+  border-color: #eec9bc;
+}
+
+.processing-step.stalled .step-icon {
+  background: #d97a53;
+  color: white;
+}
+
+
+/* =========================================
+   ERROR / RECOVERY BANNER
+========================================= */
+
+.processing-error {
+  margin-top: 20px;
+
+  padding: 16px;
+
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+
+  background: #fbeeea;
+  border: 1px solid #eec9bc;
+  border-radius: 14px;
+
+  color: #b7603b;
+}
+
+.processing-error-text {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.processing-error-text strong {
+  font-size: 12px;
+  color: #29372c;
+}
+
+.processing-error-text span {
+  font-size: 10px;
+  color: #8a8f87;
+  line-height: 1.5;
+}
+
+.processing-error-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.processing-error-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  padding: 8px 12px;
+
+  border-radius: 8px;
+  border: 1px solid #e5ddd0;
+
+  background: #fffdf8;
+  color: #29372c;
+
+  font-size: 10px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.processing-error-actions button:last-child {
+  background: #294332;
+  border-color: #294332;
+  color: white;
+}
+
+.processing-error-actions button:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 600px) {
+  .processing-error {
+    flex-direction: column;
+  }
+
+  .processing-error-actions {
+    flex-direction: row;
+    width: 100%;
+  }
+
+  .processing-error-actions button {
+    flex: 1;
+  }
+}
+
+
+/* =========================================
    RESPONSIVE
 ========================================= */
 
